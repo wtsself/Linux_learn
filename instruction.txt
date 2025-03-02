@@ -1,0 +1,4 @@
+LInux内核：LInux主要功能
+LInux发行版：LInux内核+系统级软件
+两种操作形式：图形化界面（LInux不好用）+命令行（LInux大多用这个）
+远程连接LInux，将LInux打开放后台，使用FinalShell连接

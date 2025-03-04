@@ -2,3 +2,76 @@ LInux内核：LInux主要功能
 LInux发行版：LInux内核+系统级软件
 两种操作形式：图形化界面（LInux不好用）+命令行（LInux大多用这个）
 远程连接LInux，将LInux打开放后台，使用FinalShell连接
+Linux 目录结构：
+LInux中只有一个根目录“/”，不存在多个盘，使用“/”表示层级，eg：/use/local/hello.txt,开头是根目录，后面是层级关系
+
+一：LInux命令基础
+通用格式：command [-options] [parameter]：本体，选项，参数
+
+1：ls命令
+ls [-a -l -h] [Linux路径]
+HOME目录：家目录，存放个人目录，/home/用户名，当前工作目录默认是HOME目录
+ls /是列出根目录
+-a选项：列出隐藏文件，隐藏文件是以".文件名"的格式
+-l选项：以列表形式列出目录
+可以混合使用：-al=-la=-l -a
+-h选项：配合-l命令即-lh，展示目录文件的大小单位（没有时默认为b大小）
+
+2:cd命令
+cd [Linux路径]
+cd 空：回到HOME目录,也可以cd ~回到HOME目录
+cd -：回到最近的目录
+cd .：表示当前目录 cd ./Desktop
+cd ..：回到上一层目录，也有cd ../..即是回到上两层目录
+pwd：查看当前目录
+绝对路径：以根目录为起点
+相对路径：以当前目录为起点
+
+3:mkdir命令：
+make directory：创建新的目录（文件夹）
+mkdir [-p] Linux路径
+-p:的选项是一次性创建多个层级的目录
+
+4:touch命令：
+touch Linux路径：创建文件
+cat Linux路径：查看文件内容，全部显示
+more Linux路径：支持翻译查看文件内容，空格翻页，Q退出
+
+5:cp命令
+copy：复制
+cp [-r] 参数1 参数2：将1复制给2，若2没有则创建2
+-r：用于文件夹的复制
+mv：move移动
+mv 参数1 参数2：将1移动到2
+rm：remove删除
+rm [-r -f] 参数1,参数2,参数3，...
+-r：用于删除文件夹
+-f：强制删除，只有root管理员删除时才有删除提示，该命令能取消提示
+rm支持通配符*，用来做模糊匹配：
+test*：删除以test开头的内容
+*test：删除以test结尾的内容
+*test*：删除包含test的内容
+su - root ：并输入密码进入root用户，exit退出，删库跑路，在root下执行rm -rf /*，删除根目录下所有文件
+
+6:which和find命令：
+which 要查找的命令：查找命令的文件的位置在哪里,eg:which cd
+
+find命令按照文件名查找：
+find 起始路径 -name “被查找的文件名”：从起始路径开始查找对应的文件名
+也可以使用通配符*来查找：find . -name "1*"
+
+find命令按照文件大小查找：
+find 起始路径 -size +|-n[kMG]
++,-：表示大于小于
+n：表示数字大小
+kMG：表示大小单位，k表示kb，M表示MB，G表示GB
+eg：
+find / -size -10k：查找小于10KB的文件
+find / -size +100M：查找大于100MB的文件
+find / -size +1G：查找大于1GB的文件
+
+
+
+
+
+

@@ -70,6 +70,101 @@ find / -size -10k：查找小于10KB的文件
 find / -size +100M：查找大于100MB的文件
 find / -size +1G：查找大于1GB的文件
 
+7:echo-tail-重定向符：
+echo 内容：输出指定的内容，eg：echo "hello linux"
+echo `内容`：被``（飘号）包围的内容会被当做命令来去执行，注意
+遇到重定向符时可不加，eg： echo " i love you " >> a.txt就是将内容追加到a.txt
+
+重定向符：
+>：将左侧命令的结果覆盖写入右侧指定的文件中
+>>：将左侧命令的结果追加写入右侧指定的文件中
+
+tail [-f -num] 文件名：查看文件的尾部num行的内容
+-f：f表示follow，持续跟随，退出按Ctrl+C，查看上一命令按方向键"上号"，注意在指定行数且要持续跟随时
+要将-n参数写出来，eg： tail -f -n 5 a.txt，表示持续跟随尾部5行的内容
+-num：查看尾部文件的多少行，默认为10行
+
+8:grep-wc-管道符：
+grep [-n] 关键字 指定路径：将在指定路径过滤指定关键字的内容，关键字建议加上""，跟find比，find是找
+路径，grep是找内容，eg： grep -n "itheima" /home/wts/a.txt，路径必须是一个文件
+-n：n表示是否显示行号
+wc [-c -m -l -w] 文件路径：统计文件相关信息，一字符等于一比特，空格也算
+-c：统计bytes数量
+-m：统计字符数量
+-l：统计行数
+-w：统计单词数量
+
+管道符：
+可产生输出命令 | 可接受输出命令：将左边的输出结果传递给右边做为输入，可以嵌套
+eg：cat itheima a.txt | grep itheima 
+eg：grep itheima a.txt |wc -w等于 cat a.txt|grep itheima |wc -w，cat获取文件内容，grep过滤文件内容，wc统计文件信息
+
+9:vi/vim文本编辑器：
+vim是vi的加强版本，是在命令行下对文本进行编辑，可多加练习进行熟悉
+三种工作模式：（vim 文件）进入命令模式，（按i）选择进入输入模式，（按ESC）退出进入底线命令模式（按：wq保存并退出）
+
+在命令模式下有着大量的快捷键，方便在指定的位置去编辑，举例出几个常见的命令：
+i：光标之前进入输入模式
+a：...之后
+I/0（大写I/数字0）：当前行开头
+A/$：当前行结尾
+o（小o）：当前光标下一行
+O（大o）：当前光标上一行
+pageup(PgUp)：向上翻页
+pagedown(PgDn)：向下翻页
+/：进入搜索模式，n向下搜索，N向上搜索
+gg：跳到行首
+G：跳到行尾
+dd：删除指定行，ndd删除光标以下n行
+yy：复制指定行，nyy复制逛遍以下n行
+p：粘贴复制的内容
+u：撤销修改
+ctrl+r：反向撤销修改
+dG：从当前行开始删除下面所有，dgg删除上面所有
+d$：当前光标开始删除到本行的结尾
+d0：当前光标开始删除到本行的开头
+方向键的上下左右都可以移动光标
+
+在底线命令模式下有着如下的常见快捷键：
+:wq：保存并退出
+:q!：强制退出
+
+
+二：LInux用户管理
+su [-] [用户名]：su就是swich user，切换用户
+-：表示是否在切换用户后加载环境变量
+切换用户后可以exit返回上一个用户，也可以使用快捷键ctrl+d
+普通用户切换到root用户（最大权限）时需要输入密码
+为普通用户配置sudo认证：
+在root用户下执行visudo命令，自动vi开始编辑
+在文件最后添加命令：wts ALL=(ALL) NOPASSWD:ALL，表示wts用户使用sudo命令无需输入密码
+例如在文件根目录/下，普通用户是不能创建文件的，所以在为普通用户配置sudo认证后，使用sudo mkdir woc，就
+可以创建文件了，删除时也是直接删除sudo认证就可以了
+
+
+在root用户下执行用户组的创建和删除：
+groupadd name 
+groupdel name
+
+用户组和用户的管理：
+useradd name [-g -d] :创建用户，注意用户名在前面
+-g：指定用户的组，不指定的话就会自动创建一个同用户名的用户组，eg：useradd wts2 -g woc -d /home/wts2
+-d：指定用户的HOME路径，不指定，HOME目录默认在/home/用户名
+userdel [-r] name：删除用户
+-r：删除用户的HOME目录，不适用时保存HOME目录
+id name：查看用户所在的组和id信息，eg：uid=1001(wts2) gid=1001(woc) groups=1001(woc)
+usermod -aG 用户组 用户名：将指定用户加入指定的用户组
+例如：uid=1001(wts2) gid=1001(woc) groups=1001(woc),1002(fuck)，表示wts2用户加入了woc和fuck组
+注意：
+当使用Groupdel一个组的时候，如果有用户把这个组当作主组，那么删除这个组时就会出现这个
+报错信息。 解决方法就是更换用户的主组，使用usermod -g groupname username。当没有
+用户把这个组当作主组的时候，使用groupdel groupname时便可以把这个组删除掉。
+getent passwd：查看当前系统中有哪些用户
+getent group：查看当前系统中有哪些组
+
+
+
+
 
 
 

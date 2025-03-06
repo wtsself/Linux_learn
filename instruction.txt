@@ -5,7 +5,8 @@ LInux发行版：LInux内核+系统级软件
 Linux 目录结构：
 LInux中只有一个根目录“/”，不存在多个盘，使用“/”表示层级，eg：/use/local/hello.txt,开头是根目录，后面是层级关系
 
-一：LInux命令基础
+第一部分：
+LInux命令基础
 通用格式：command [-options] [parameter]：本体，选项，参数
 
 1：ls命令
@@ -120,7 +121,7 @@ yy：复制指定行，nyy复制逛遍以下n行
 p：粘贴复制的内容
 u：撤销修改
 ctrl+r：反向撤销修改
-dG：从当前行开始删除下面所有，dgg删除上面所有
+dG：从当前行开始删除下面所有，dgg删除上面所有，包括光标所在行
 d$：当前光标开始删除到本行的结尾
 d0：当前光标开始删除到本行的开头
 方向键的上下左右都可以移动光标
@@ -130,12 +131,18 @@ d0：当前光标开始删除到本行的开头
 :q!：强制退出
 
 
-二：LInux用户管理
-su [-] [用户名]：su就是swich user，切换用户
+第二部分：
+LInux用户管理
+
+su [-] [用户名]：su就是swich user，切换用户，注意是输入目标用户的密码后即可切换
 -：表示是否在切换用户后加载环境变量
+su -/su - root：都是默认进入root用户
+sudo -i：提升权限至root用户，但不切换环境。
+sudo -s：提升权限至root用户，并切换环境。
+在Ubuntu的下普通用户进入root用户是输入"sudo su"来进入root
 切换用户后可以exit返回上一个用户，也可以使用快捷键ctrl+d
 普通用户切换到root用户（最大权限）时需要输入密码
-为普通用户配置sudo认证：
+为普通用户配置sudo认证（使其拥有一定的root权限）：
 在root用户下执行visudo命令，自动vi开始编辑
 在文件最后添加命令：wts ALL=(ALL) NOPASSWD:ALL，表示wts用户使用sudo命令无需输入密码
 例如在文件根目录/下，普通用户是不能创建文件的，所以在为普通用户配置sudo认证后，使用sudo mkdir woc，就
@@ -159,8 +166,78 @@ usermod -aG 用户组 用户名：将指定用户加入指定的用户组
 当使用Groupdel一个组的时候，如果有用户把这个组当作主组，那么删除这个组时就会出现这个
 报错信息。 解决方法就是更换用户的主组，使用usermod -g groupname username。当没有
 用户把这个组当作主组的时候，使用groupdel groupname时便可以把这个组删除掉。
-getent passwd：查看当前系统中有哪些用户
-getent group：查看当前系统中有哪些组
+getent passwd/compgen -u：查看当前系统中有哪些用户
+getent group/compgen -g：查看当前系统中有哪些组
+
+查看权限控制信息：
+通过ls -l，可以看到前面是由三部分组成：
+(rwx权限) [所属用户] {所属用户组}
+lrwxrwxrwx   1 root root          7 10月  8  2023 bin -> usr/bin
+drwxr-xr-x   4 root root       4096 11月 26 10:41 boot
+drwxrwxr-x   2 root root       4096 10月  8  2023 cdrom
+drwxr-xr-x  19 root root       4320  3月  6 12:51 dev
+drwxr-xr-x 132 root root      12288  3月  6 13:59 etc
+lrwxrwxrwx   1 root root          8 10月  8  2023 sbin -> usr/sbin
+drwxr-xr-x  14 root root       4096 10月  8  2023 snap
+drwxr-xr-x   2 root root       4096  8月  8  2023 srv
+-rw-------   1 root root 2243952640 10月  8  2023 swapfile
+dr-xr-xr-x  13 root root          0  3月  6 12:43 sys
+drwxrwxrwt  18 root root       4096  3月  6 13:59 tmp
+drwxr-xr-x  14 root root       4096  8月  8  2023 usr
+drwxr-xr-x  14 root root       4096  8月  8  2023 var
+drwxr-xr-x   2 root root       4096  3月  6 13:11 woc
+对rwx权限，首位-是文件，d是文件夹，l是软链接；后面九位，分三部分，分别是
+所属用户权限，所属用户组权限，其它用户权限；r是读，w是写，x是可执行（execute）
+
+chmod命令:
+该命令可以修改文件，文件夹的权限，只有文件，文件夹的所属用户或root用户可以修改
+chmod [-R] 权限（ugo三部分） 文件/文件夹
+-R：对文件夹内的所有内容应用同样的权限设置
+chmod u=rwx g=rx o=x hello.txt
+对权限部分可以简化为二进制的（0->7）位数字,如何rwx为：1+2+4=7,rx为1+4=5
+简化为了：chmod 751 hello.txt
+
+chown命令：
+可以修改文件/文件夹的所属用户，用户组，只有root用户可以用（哈哈，普通用户主宰不了自己的文件，root:你很会打吗？你会打有个屁用啊。出来混要有势力，要有背景，你哪个道上的？原来是小可爱。）
+chown [-R] [用户][:][用户组] 文件/文件夹
+-R：对文件夹内的所有内容应用同样的权限设置
+:用于分隔用户和用户组
+
+
+第三部分：
+Linux各类应用操作
+
+ctrl+c：强制停止
+ctrl+d：退出或登出
+history命令：
+查看历史输入过的命令，查看后再输入"！命令前缀"，来自动匹配并执行对应命令
+也可以通过ctrl+r来搜索历史命令
+光标移动快捷键：
+ctrl+a跳到命令开头
+ctrl+e跳动命令结尾
+ctrl+键盘左键，向左跳一个单词，注意是单词
+ctrl+键盘右键，向右跳一个单词
+清屏：ctrl+l或clear命令
+
+软件安装：
+centos:软件包是.rpm，包管理器是yum
+ubuntu:软件包是.deb，包管理器是apt
+
+只对于centos（Ubuntu用不了以下的方法）：
+yum：RPM包软件管理器，可用于在Linux上自动安装配置软件，自动解决依赖问题
+语法：yum [-y] [intall|remove|search] 软件名称
+-y：自动确认安装和卸载过程
+需要root权限和联网
+安装wget ：yum -y install wget
+
+对于Ubuntu：
+语法：apt [-y] [intall|remove|search] 软件名称
+安装wget ：apt -y install wget
+用法同centos一样，只是yum变为了apt
+
+
+
+
 
 
 

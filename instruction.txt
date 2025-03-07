@@ -1,3 +1,4 @@
+视频教程地址：https://www.bilibili.com/video/BV1n84y1i7td
 LInux内核：LInux主要功能
 LInux发行版：LInux内核+系统级软件
 两种操作形式：图形化界面（LInux不好用）+命令行（LInux大多用这个）
@@ -20,7 +21,7 @@ ls /是列出根目录
 
 2:cd命令
 cd [Linux路径]
-cd 空：回到HOME目录,也可以cd ~回到HOME目录
+cd 空：回到HOME目录,也可以cd ~回到HOME目录，注意，~就是home目录，是特殊路径
 cd -：回到最近的目录
 cd .：表示当前目录 cd ./Desktop
 cd ..：回到上一层目录，也有cd ../..即是回到上两层目录
@@ -136,6 +137,9 @@ LInux用户管理
 
 su [-] [用户名]：su就是swich user，切换用户，注意是输入目标用户的密码后即可切换
 -：表示是否在切换用户后加载环境变量
+注意：
+sudo 命令（SuperUser Do）：以其他用户的权限（默认 root）执行单条命令，需要输入当前用户的密码。
+
 su -/su - root：都是默认进入root用户
 sudo -i：提升权限至root用户，但不切换环境。
 sudo -s：提升权限至root用户，并切换环境。
@@ -234,6 +238,71 @@ yum：RPM包软件管理器，可用于在Linux上自动安装配置软件，自
 语法：apt [-y] [intall|remove|search] 软件名称
 安装wget ：apt -y install wget
 用法同centos一样，只是yum变为了apt
+
+systemctl控制软件/服务启动，停止，开机，自启：
+能够被systemctl管理的软件，一般称之为：服务
+systemctl start|stop|status|enable|disable 服务名
+enable：开机自启动
+disable：关闭开机自启动
+系统内置的部分服务有如下：
+networkmanager：主网络服务
+network：副网络服务
+firewalld：防火墙服务
+sshd：ssh服务
+注意不是所有的软件都会被systemctl管理，有些需要自己手动添加
+
+ln命令创建软连接（快捷方式）：
+ln -s 参数1 参数2：创建完成后，使用ls -l，可以看到该文件或文件夹有箭头标识
+-s：创建软连接
+参数1：被链接的文件或文件夹
+参数2：要链接去的地方（注意不能同名）
+eg：ln -s /etc/yum.conf ~/yum.conf
+
+日期和时间：
+date命令：来查看系统时间
+date [-d] [+格式化字符串]
+-d：按照给定的字符串显示日期，用于日期计算
+%Y：年;%y：年份后两位数字
+%m：月;
+%d：日，两位数值；%D：是六位数值
+%H：小时，两位数值；%h：一位数加“月”
+%M：分钟
+%S：秒；%s：是一长串数字
+eg： date "+%Y-%m-%d %H:%M:%S"
+date命令进行日期加减：
+date -d "+1 day" +"%Y%m%d"：显示后一天日期
+date -d "-1 year" +"%Y%m%d"：显示前一年日期
+
+修改LInux时区：
+在root权限下，删除原来时区，东八区上海的时间软链接到/etc/localtime
+rm -f /etc/localtime
+ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+
+ntp程序：自动校准系统时间
+system start ntpd：打开ntp
+systemctl enable ntpd：开机自启动
+
+ip地址和主机名：
+IP地址有两个版本为V4版本和V6版本（少）
+IPV4版本的地址格式是：a,b,c,d：都是0~255的数字
+使用ifconfig来查看IP地，centos中ens33是主网卡，inte为IP地址
+特殊的IP地址有：127.0.0.1，指代本机；0.0.0.0也可以指代本机，也有其它作用
+使用hostname查看本机的主机名
+使用hostnamectl set-hostname "主机名":修改主机名
+
+域名解析：使用DNS服务器中的域名和IP地址的映射关系来访问网页
+可以自己本地设置映射关系记录：
+在LInux中的/etc/hosts中有对应本地的域名设置
+在Windows中的C:\Windows\System32\drivers\etc\hosts中有对应本地的域名设置
+在解析域名时先查看本地的域名记录里有没有，没有再从公共域名DNS服务器（144.144.144.144/8.8.8.8）
+里去取，可以通过设置windows本地的关于虚拟机的域名记录，在finalshell中直接用主机名连接LInux虚拟机
+
+
+
+
+
+
+
 
 
 

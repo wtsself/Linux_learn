@@ -1,4 +1,5 @@
 视频教程地址：https://www.bilibili.com/video/BV1n84y1i7td
+在记事本中ctrl+HOME跳到开头，ctrl+END跳到结尾
 LInux内核：LInux主要功能
 LInux发行版：LInux内核+系统级软件
 两种操作形式：图形化界面（LInux不好用）+命令行（LInux大多用这个）
@@ -117,8 +118,8 @@ pagedown(PgDn)：向下翻页
 /：进入搜索模式，n向下搜索，N向上搜索
 gg：跳到行首
 G：跳到行尾
-dd：删除指定行，ndd删除光标以下n行
-yy：复制指定行，nyy复制逛遍以下n行
+dd：删除指定行，ndd删除光标以下n行，包括光标所在行
+yy：复制指定行，nyy复制光标以下n行，包括光标所在行
 p：粘贴复制的内容
 u：撤销修改
 ctrl+r：反向撤销修改
@@ -130,7 +131,8 @@ d0：当前光标开始删除到本行的开头
 在底线命令模式下有着如下的常见快捷键：
 :wq：保存并退出
 :q!：强制退出
-
+:set nu：显示行号
+:set paste：设置粘贴模式
 
 第二部分：
 LInux用户管理
@@ -241,7 +243,8 @@ yum：RPM包软件管理器，可用于在Linux上自动安装配置软件，自
 
 systemctl控制软件/服务启动，停止，开机，自启：
 能够被systemctl管理的软件，一般称之为：服务
-systemctl start|stop|status|enable|disable 服务名
+systemctl start|stop|restart|status|enable|disable 服务名
+restart：重启
 enable：开机自启动
 disable：关闭开机自启动
 系统内置的部分服务有如下：
@@ -287,31 +290,122 @@ IP地址有两个版本为V4版本和V6版本（少）
 IPV4版本的地址格式是：a,b,c,d：都是0~255的数字
 使用ifconfig来查看IP地，centos中ens33是主网卡，inte为IP地址
 特殊的IP地址有：127.0.0.1，指代本机；0.0.0.0也可以指代本机，也有其它作用
+公共DNS服务器是114.114.114.114
 使用hostname查看本机的主机名
 使用hostnamectl set-hostname "主机名":修改主机名
 
 域名解析：使用DNS服务器中的域名和IP地址的映射关系来访问网页
 可以自己本地设置映射关系记录：
 在LInux中的/etc/hosts中有对应本地的域名设置
-在Windows中的C:\Windows\System32\drivers\etc\hosts中有对应本地的域名设置
+在Windows中的C:\Windows\System32\drivers\etc\hosts中有对应本地的域名设置，末尾空行添加"IP地址 主机名"，如192.168.88.130 centos7，保存并关闭，
 在解析域名时先查看本地的域名记录里有没有，没有再从公共域名DNS服务器（144.144.144.144/8.8.8.8）
 里去取，可以通过设置windows本地的关于虚拟机的域名记录，在finalshell中直接用主机名连接LInux虚拟机
 
 
+固定Linux的ip地址：
+由于DHCP动态分配ip地址，导致ip地址一直在重启后变化，为了使远程连接的LInux不会变化ip地址
+所有要固定LInux的ip地址，使其变为静态ip
+在windows情况下，打开wmware，编辑-》虚拟网络编辑器-》选择wmwave net8修改子网ip和子网掩码-》
+-》点击nat继续修改默认网关-》确定返回重启LInux（eg：分别的网络地址192.168.88.0 
+255.255.255.0 192.168.88.2，此时设置的网络ip地址范围为192.168.88.0->192.168.88.254）
+打开LInux在root用户下输入：vim /etc/sysconfig/network-scripts/ifcfg-ens33，修改主网卡设置
+然后重启主网络：systemctl restart network，我这里修改的ip地址为192.168.88.130，使用ifconfig查看时为：
+ens33: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.88.130  netmask 255.255.255.0  broadcast 192.168.88.255
 
+网络传输：
+ping [-c num] ip/主机名：查看指定的网络是否联通
+-c：检查的次数，没有则无限次循环
 
+wget [-b] url:wget是非交互式的文件下载器，在命令行下载网络文件
+-b：后台下载，将日志写入到当前工作目录的wget-log文件，使用tail -f wget-log来持续观察下载情况
+url：下载链接
+下载Hadoop:http://archive.apache.org/dist/hadoop/common/hadoop-3.3.0/hadoop-3.3.0.tar.gz
 
+curl [-O] url：向指定的url发送一个http请求，类似于打开一个网页但没有图形化页面
+-O：是表示下载文件
+eg：curl cip.cc，来查看本地的网络运营商
 
+端口：
+是设备与外界通讯交流的出入口，分为物理端口和虚拟端口
+物理端口：又能称为接口，是物理可见的，如USB接口，HDMI端口，PCIE接口等
+虚拟端口：是指计算机内部的不可见的端口，用来操作系统与外部进行交互使用的
+一个ip地址对应一个设备，端口对应其中的程序，如一个小区的地址是ip地址，一户人家的门牌号为端口
+LInux就是一个超大号的小区，可以支持65535个端口，分为三类端口
+公认端口：1~1023为系统内置或限定程序使用，如ssh服务的22端口，https服务的443端口
+注册端口：1024~49151，松散的绑定一些程序或服务
+动态端口：49152~65535，用作临时使用，通常不会绑定程序或服务
+使用nmap查看对应ip地址对应的设备的公共（暴露）的端口
+先下载nmap：yum -y nmap，再查看本机的端口nmap127.0.0.1
+使用netstat命令来查看指定端口的占用情况,也可以查看对应进程的端口占用情况
+语法：netstat -anp |grep 端口号，先安装yum -y install net-tools
 
+进程：
+是操作系统为管理每一个运行的程序而注册的一个进程，并为每一个进程分配一个进程号ID
+程序运行起来便成为了进程doge
+ps [-e -f]：查看进程,可通过管道符和grep查询对应的进程
+-e：显示出全部的进程
+-f：显示全部的信息
+kill [-9] 进程ID：终止进程
+-9：强制关闭
 
+主机状态监控：
+top：查看系统资源占用，有着很多的命令，使用时上网查询即可，分别是top命令选项，top交互式选项
+df [-h]：查看硬盘的使用情况
+-h：以更加人性化的单位显示
+iostat [-x] [num1 num2]：查看cpu和磁盘速率的信息
+-x：显示更多信息
+[num1 num2]：刷新间隔为num1，刷新次数为num2
+sar -n DEV num1 num2：查看网络的相关统计，该命令相当复杂，这里简单的用于统计网络
+-n和DEV表示查看网络，网络接口
+num1刷新间隔，num2次数，不写则是无限次
 
+环境变量：
+是操作系统在运行的时候，记录的一些关键性信息，用以辅助系统的运行
+env：查看LInux系统中记录的环境变量，环境变量是一种KeyValue型结构
+环境变量：PATH
+使用命令查看env|grep PATH
+$Key：$符号，输出对应的Value值如echo $PATH,这里的echo是读取后面的值（可以是表达式变量）并输出
+eg：
+[root@centos7 wts]# echo $PATH
+/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin
+：是分隔符
+自行设置环境变量：
+临时设置，语法：export 变量名=变量值
+永久设置：
+对于当前用户，配置在~/.bashrc文件中，vim打开并在末尾添加export MYNAME=wts,设置
+后使用source .bashrc来立即生效，eg如下：
+[wts@centos7 ~]$ vim ~/.bashrc	
+[wts@centos7 ~]$ source .bashrc
+[wts@centos7 ~]$ echo $MYNAME
+wts
+对于所有用户，配置在/etc/profile中，root下vim打开并在末尾添加export MYFACE=cool,设置
+后使用source /etc/profile来立即生效，eg如下：
+[root@centos7 ~]# vim /etc/profile
+[root@centos7 ~]# source /etc/profile
+[root@centos7 ~]# echo $MYFACE
+cool
 
-
-
-
-
-
-
+自定义环境变量PATH：记录了系统执行命令的搜索路径
+测试：
+在HOME目录创建文件夹myenv，cd文件夹内，vim创建并编辑内容 echo "哈哈"
+[root@centos7 myenv]# ./myhaha
+-bash: ./myhaha: Permission denied
+运行出现上面错误则修改权限，使用chmod 755 myhaha，所有人都可以使用这个文件
+-rw-r--r--. 1 root root 14 Mar  8 20:28 myhaha修改为-rwxr-xr-x. 1 root root 14 Mar  8 20:28 myhaha
+运行成功为：
+[root@centos7 myenv]# ./myhaha
+哈哈
+再进入/etc/profile中，添加PATH的自己的路径
+export PATH=$PATH:/root/myenv：注意这里一定要以追加的方式来添加自己的PATH路径，需要先加上$PATH再用:分隔并添加
+成功了如下所示：
+[root@centos7 myenv]# echo $PATH
+/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin:/root/myenv
+[root@centos7 ~]# myhaha
+哈哈
+使用which查看命令的位置：
+[root@centos7 ~]# which myhaha
+/root/myenv/myhaha
 
 
 

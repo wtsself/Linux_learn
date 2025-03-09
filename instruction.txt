@@ -88,9 +88,38 @@ tail [-f -num] 文件名：查看文件的尾部num行的内容
 -num：查看尾部文件的多少行，默认为10行
 
 8:grep-wc-管道符：
-grep [-n] 关键字 指定路径：将在指定路径过滤指定关键字的内容，关键字建议加上""，跟find比，find是找
+grep [-n/-i/-v/-c/-E] 关键字 指定路径：将在指定路径过滤指定关键字的内容，关键字建议加上""，跟find比，find是找
 路径，grep是找内容，eg： grep -n "itheima" /home/wts/a.txt，路径必须是一个文件
--n：n表示是否显示行号
+-i：忽略大小写
+-v：反向查找，即查找不匹配的行
+-c：统计匹配的行数
+-n：显示匹配行的行号
+-E：使用扩展正则表达式ERE（Extented Regular Expression），这表明grep默认使用的是BRE
+
+拓展:
+学习正则表达式：BRE（Basic Regular Expression）
+可以参考网站：https://regexr-cn.com/
+.（点号）（dot表示任意单个字符）
+^（插入符）（^用于匹配行的开头）
+$（美元符号）（$用于匹配行的结尾）
+[]（方括号）（方括号用于定义一个字符类，匹配其中的任何单个字符）
+-（范围）（在方括号内，-用于表示字符范围）
+ *（星号）（*表示前一个元素可以重复零次或多次）
+\{n\}（大括号）（BRE中并不直接支持 {} 来表示数量，但可以用 \{n\} 来指定匹配重复的次数）
+例如：ab\{3\}这个正则表达式匹配 ab 后面跟着恰好3个字符的字符串。
+^[aeiou]\{1,3\}$这个正则会匹配由 1 到 3 个元音字母组成的字符串，如 a、ae、iou 等。
+[^a-z]中会匹配不是小写字母的字符，^在括号内表示取反
+转义字符（正则表达式中的某些字符如*、.、^等，具有特殊的含义。如果需要匹配这些字符本
+身，需要使用转义字符 \）,如\. \*  \\转义特殊字符
+\w：匹配任意A-Z,a-z,0-9的字符
+\d：匹配任意0-9的数字，而\D则是匹配非数字的字符
+\s：匹配任意不是\w的字符，等同于\W，而\S是等同于\w
+\t\n\r	制表符, LF换行符, CR换行符
+\b：单词边界，\B是单词边界
+使用 grep 查找匹配模式
+grep '^[0-9]\{3\}$' filename.txt：这个命令会在文件 filename.txt 中查找所有由恰好三位数字组成的行。
+还有有关sed的使用，更多的就是shell脚本的内容了，参考网站：https://www.runoob.com/linux/linux-shell.html
+
 wc [-c -m -l -w] 文件路径：统计文件相关信息，一字符等于一比特，空格也算
 -c：统计bytes数量
 -m：统计字符数量
@@ -282,7 +311,7 @@ rm -f /etc/localtime
 ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 ntp程序：自动校准系统时间
-system start ntpd：打开ntp
+systemctl start ntpd：打开ntp
 systemctl enable ntpd：开机自启动
 
 ip地址和主机名：
@@ -336,7 +365,7 @@ LInux就是一个超大号的小区，可以支持65535个端口，分为三类�
 注册端口：1024~49151，松散的绑定一些程序或服务
 动态端口：49152~65535，用作临时使用，通常不会绑定程序或服务
 使用nmap查看对应ip地址对应的设备的公共（暴露）的端口
-先下载nmap：yum -y nmap，再查看本机的端口nmap127.0.0.1
+先下载nmap：yum -y install nmap，再查看本机的端口nmap127.0.0.1
 使用netstat命令来查看指定端口的占用情况,也可以查看对应进程的端口占用情况
 语法：netstat -anp |grep 端口号，先安装yum -y install net-tools
 
@@ -406,6 +435,54 @@ export PATH=$PATH:/root/myenv：注意这里一定要以追加的方式来添加
 使用which查看命令的位置：
 [root@centos7 ~]# which myhaha
 /root/myenv/myhaha
+
+LInux文件的上传和下载：
+如果查看不到root文件内容可以修改登录的用户名和登录密码并重启finalshell
+在FinalShell中的文件视图中选择对应文件直接右键下载即可把LInux中的文件下载到windows中，在fsdownload文件夹中
+上传也是简单的拖拽文件或复制文件到文件视图中即可
+也可以通过命令来传输文件：
+yum -y install lrzsz：安装rz，sz命令
+rz：输入rz后运行，然后在弹出框内选择要上传的windows中的文件
+sz 文件：下载文件到fsdownload文件夹中
+
+压缩和解压：
+LInux中操作tar，gzip，zip三种压缩格式
+
+LInux和Mac有两种常见压缩格式：
+.tar：也称为tarball，归档文件，文件体积没有减少多少，只是简单的封装
+.gz：gzip格式压缩文件，大大减少文件的体积
+使用tar命令压缩和解压缩
+tar [-c -V -x -f -z -C] 参数1 参数2 参数3……参数N
+-c：创建压缩文件，用于压缩模式
+-v：显示压缩解压过程，查看进度
+-x：解压模式
+-f：表示要创建的文件夹或要解压的文件，在所有选项中的最后一个
+-z：gzip压缩模式，没有则为普通的taibal格式
+-C：解压的目的地，用于解压模式
+常见的tar压缩组合：
+tar -cvf test.tar 1.txt 2.txt 3.txt：将三个文件压缩到test.tar文件内
+tar -gcvf test.tar 1.txt 2.txt 3.txt：将三个文件以gzip压缩格式压缩到test.tar文件内，有z时一般处于首位
+常见的tar解压组合：
+tar -xvf test.tar：解压到当前目录
+tar -xvf test.tar -C /home/wts：解压到指定目录
+tar -zxvf test.tar -C /home/wts：使用gzip解压格式解压到指定目录
+
+zip命令压缩文件：
+zip [-r] 参数1 参数2……参数N
+-r：当有文件被压缩时使用
+zip test.zip a.txt b.txt：将两个文档压缩到test.zip中
+zip -r test.zip Desktop a.txt：将一个文档和文件压缩到test.zip中
+
+unzip命令解压文件：
+unzip 参数 [-d] 
+-d：指定要解压去的位置，同tar的-C选项，没有则为当前目录
+参数：被解压的zip压缩包文件
+
+
+
+
+
+
 
 
 

@@ -189,9 +189,10 @@ groupadd name
 groupdel name
 
 用户组和用户的管理：
-useradd name [-g -d] :创建用户，注意用户名在前面
+useradd name [-g -d -m] :创建用户，注意用户名在前面
 -g：指定用户的组，不指定的话就会自动创建一个同用户名的用户组，eg：useradd wts2 -g woc -d /home/wts2
 -d：指定用户的HOME路径，不指定，HOME目录默认在/home/用户名
+-m：自动创建用户的家目录 /home/用户名
 userdel [-r] name：删除用户
 -r：删除用户的HOME目录，不适用时保存HOME目录
 id name：查看用户所在的组和id信息，eg：uid=1001(wts2) gid=1001(woc) groups=1001(woc)
